@@ -1,6 +1,8 @@
 # k8s-auto-install
 > 根据k8s官方社区的centos版本的安装脚本，根据自己的需求和安装场景进行了改编，使kubernetes高可用环境能半自动化部署
+
 > 脚本安装完成后，所有的组件均使用TLS加密通信，部署架构为：三台master节点，N台node节点，master节点可与node节点合用
+
 > **所有的安装均以admin用户为例，有sudo权限**
 
 ### 安装前置条件
@@ -30,7 +32,7 @@ heapster-influxdb-amd64:v1.1.1
 节点hostname不需要单独设置，脚本会自动设置本地hostname.
 node节点与master节点合用
 
-###　master和etcd集群安装步骤
+### master和etcd集群安装步骤
 #### 1、拷贝安装包
 - 拷贝所有的二进制安装包到所有的节点/home/admin/local/bin目录下
 - 拷贝k8s-auto-install目录到所有的节点/home/admin目录下
