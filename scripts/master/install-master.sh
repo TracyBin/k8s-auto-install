@@ -10,7 +10,7 @@ SSH_OPTS="-oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -oLogLevel=E
 function usage() {
 	echo "requires some arguments"
 	echo "Usage: "
-    echo "   install-master.sh  --master1 master1-ip --master2 master2-ip --master3 master1-ip --hostname current-host-name --ip current-host-ip --user current_user"
+    echo "   install-master.sh  --master1 master1-ip --master2 master2-ip --master3 master1-ip --hostname current-host-name --ip current-host-ip --user user"
 }
 
 function load_image() {
@@ -35,9 +35,10 @@ function install-pre() {
 	systemctl stop NetworkManager;systemctl stop firewalld;
 	
 	# 拷贝可执行文件到${CURRENT_HOME}/local/bin
+	mkdir -p ${MASTER_ROOT}/certs/;
 	chmod +x ${CURRENT_HOME}/local/bin/*
 	sed -e "s/\\\$MASTER_1/${MASTER_1}/g" -e "s/\\\$MASTER_2/${MASTER_2}/g" -e "s/\\\$MASTER_3/${MASTER_3}/g" -e "s|\$CURRENT_HOME|${CURRENT_HOME}|g" "${MASTER_ROOT}/environment.sh.sed" > ${MASTER_ROOT}/environment.sh
-	
+	cp ${MASTER_ROOT}/environment.sh ${MASTER_ROOT}/certs/;
 	source ${MASTER_ROOT}/environment.sh
 	# load_image
 	echo "install pre success"
@@ -135,6 +136,7 @@ fi
 
 
 mkdir -p /etc/kubernetes/ssl /etc/etcd/ssl
+chmod 755 ca* etcd*.pem
 cp ca* /etc/kubernetes/ssl
 cp etcd*.pem /etc/etcd/ssl;
 
@@ -417,7 +419,7 @@ function provision-master() {
 	echo `pwd`
 	for master in ${MASTERS[@]}
 	do
-		kube-scp "${master}" "./*" "${CURRENT_HOME}/https/scripts/master/certs/"
+		kube-scp "${master}" "*" "${CURRENT_HOME}/k8s-auto-install/scripts/master/certs/"
 	done
 }
 
@@ -426,7 +428,7 @@ function sync-master() {
 	echo `pwd`
 	for master in ${MASTERS[@]}
 	do
-		kube-ssh "${master}" "sudo bash ${CURRENT_HOME}/https/scripts/master/install-master.sh --master1 ${MASTER_1} --master2 ${MASTER_2} --master3 ${MASTER_3} --hostname ${ETCD_NAME} --ip ${MASTER_ADDRESS} >>${CURRENT_HOME}/install.log $"
+		kube-ssh "${master}" "sudo bash ${CURRENT_HOME}/k8s-auto-install/scripts/master/install-master.sh --master1 ${MASTER_1} --master2 ${MASTER_2} --master3 ${MASTER_3} --hostname ${ETCD_NAME} --ip ${MASTER_ADDRESS} >>${CURRENT_HOME}/install.log $"
 	done
 }
 
@@ -494,7 +496,7 @@ do
 			;;
 		*)
 			echo "Usage: "
-			echo "   install-master.sh  --master1 master1-ip --master2 master1-ip --master3 master1-ip --hostname current-host-name --ip current-host-ip --user current_user"
+			echo "   install-master.sh  --master1 master1-ip --master2 master1-ip --master3 master1-ip --hostname current-host-name --ip current-host-ip --user user"
 			exit 1
 			;;
     esac

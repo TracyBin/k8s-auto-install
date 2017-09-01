@@ -4,13 +4,13 @@
 set -e
 INSTALL_ROOT=$(dirname "${BASH_SOURCE}")/../..
 readonly CURRENT_DIR=$(cd `dirname $0`; pwd)
-
+SSH_OPTS="-oStrictHostKeyChecking=no -oUserKnownHostsFile=/dev/null -oLogLevel=ERROR -C"
 
 
 function usage() {
 	echo "requires some arguments"
 	echo "Usage: "
-    echo "   install-node.sh  --master master-ip --hostname current-host-name --nodeip current-host-ip"
+    echo "   install-node.sh  --master master-ip --hostname current-host-name --nodeip current-host-ip --user user "
 }
 
 function load_image() {
@@ -26,27 +26,39 @@ function load_image() {
 	echo "------------------------------------------------------------"
 }
 
+
+# Copy file from the remote to local
+function kube-scp() {
+  local remote="$1"
+  local local="$2"
+  echo ${remote}
+  echo ${local}
+  scp -r ${SSH_OPTS} ${remote} "${local}"
+}
+
+function copy-certs() {
+	local SRC_DIR=${CURRENT_HOME}/k8s-auto-install/scripts;
+	mkdir -p ${SRC_DIR}/node/certs
+	kube-scp "${CURRENT_USER}@${MASTER_ADDRESS}:${SRC_DIR}/master/certs/*" "${SRC_DIR}/node/certs"
+	mv ${SRC_DIR}/node/certs/environment.sh ${CURRENT_DIR}/
+}
+
 function install-pre() {
 	echo "------------------------------------------------------------"
 	echo "ready the precondition"
 	# 验证参数是否完整
-	if [ "${MASTER_ADDRESS}" == "" ] || [ "${NODE_ADDRESS}" == "" ] || [ "${NODE_NAME}" == "" ]; then
+	if [ "${MASTER_ADDRESS}" == "" ] || [ "${NODE_ADDRESS}" == "" ] || [ "${NODE_NAME}" == "" ] || [ "${CURRENT_USER}" == "" ]; then
 		usage
 		exit 1
 	fi
 	
+	# 拷贝master节点环境变量
+	copy-certs
 	# 执行环境变量
-	rm -rf ${CURRENT_DIR}/environment.sh
-	cp ${INSTALL_ROOT}/scripts/master/environment.sh ${CURRENT_DIR}/;
 	chmod +x ${CURRENT_DIR}/environment.sh
 	source ${CURRENT_DIR}/environment.sh
 	
-	# 拷贝可执行文件到${CURRENT_HOME}/local/bin
-	echo "begin copy binary file to ${CURRENT_HOME}/local"
-	mkdir -p /etc/kubernetes/cfg ${CURRENT_HOME}/local/bin
-	# cp -f ${INSTALL_ROOT}/local/bin/* ${CURRENT_HOME}/local/bin;
 	chmod +x ${CURRENT_HOME}/local/bin/* 
-	echo "end copy binary file to ${CURRENT_HOME}/local"
 	
 	setenforce 0;
 	iptables -P FORWARD ACCEPT;
@@ -57,7 +69,7 @@ function install-pre() {
 	
 	#拷贝证书
 	mkdir -p /etc/kubernetes/ssl
-	cp ${CURRENT_DIR}/../master/certs/ca* /etc/kubernetes/ssl
+	cp ${CURRENT_DIR}/../node/certs/ca* /etc/kubernetes/ssl
 	
 	echo "the precondition success"
 	echo "------------------------------------------------------------"
@@ -237,7 +249,7 @@ EOF
 
 
 
-ARGS=`getopt -o a:b:c: --long master:,hostname:,nodeip: -n 'install-node.sh' -- "$@"`
+ARGS=`getopt -o a:b:c:d: --long master:,hostname:,nodeip:,user: -n 'install-node.sh' -- "$@"`
 if [ $? != 0 ]; then
 	echo "Terminating...."
 	exit 1
@@ -263,13 +275,18 @@ do
 			export NODE_ADDRESS=$2;
 			shift 2
 			;;
+		-d|--user)
+			export CURRENT_USER=$2;
+			export CURRENT_HOME="/home/${CURRENT_USER}"
+			shift 2
+			;;
 		--)  
 			shift
 			break
 			;;
 		*)
 			echo "Usage: "
-			echo "   install-node.sh  --master master-ip --hostname current-host-name --nodeip current-host-ip"
+			echo "   install-node.sh  --master master-ip --hostname current-host-name --nodeip current-host-ip --user user"
 			exit 1
 			;;
     esac

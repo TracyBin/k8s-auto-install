@@ -3,7 +3,7 @@
 # TLS Bootstrapping 使用的 Token，可以使用命令 head -c 16 /dev/urandom | od -An -t x | tr -d ' ' 生成
 BOOTSTRAP_TOKEN="7007baae247a3bcd73f9cb9ea24f618c"
 
-export PATH=/home/admin/local/bin:$PATH
+export PATH=$CURRENT_HOME/local/bin:$PATH
 
 # 最好使用 主机未用的网段 来定义服务网段和 Pod 网段
 
