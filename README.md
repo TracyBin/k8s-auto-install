@@ -137,10 +137,10 @@ sudo ./install-addons.sh
 ```
 [admin@master-1 ~]$ sudo ./local/bin/kubectl get pods --all-namespaces -o wide
 NAMESPACE     NAME                                        READY     STATUS    RESTARTS   AGE       IP                NODE
-kube-system   calico-node-09t5k                           2/2       Running   0          1m        10.12.2.253       master-3
-kube-system   calico-node-hv35j                           2/2       Running   0          1m        10.12.2.245       master-1
-kube-system   calico-node-smkc9                           2/2       Running   0          1m        10.12.2.252       master-2
-kube-system   calico-policy-controller-1746561077-t3d6n   1/1       Running   0          1m        10.12.2.245       master-1
+kube-system   calico-node-09t5k                           2/2       Running   0          1m        10.12.2.153       master-3
+kube-system   calico-node-hv35j                           2/2       Running   0          1m        10.12.2.151       master-1
+kube-system   calico-node-smkc9                           2/2       Running   0          1m        10.12.2.152       master-2
+kube-system   calico-policy-controller-1746561077-t3d6n   1/1       Running   0          1m        10.12.2.151       master-1
 kube-system   heapster-2929994463-h75fd                   1/1       Running   0          1m        192.168.205.193   master-2
 kube-system   kube-dns-3119898146-ntt41                   3/3       Running   0          1m        192.168.39.2      master-1
 kube-system   kubernetes-dashboard-908585402-722s0        1/1       Running   0          1m        192.168.39.1      master-1
