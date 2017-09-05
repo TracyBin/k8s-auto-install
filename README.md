@@ -102,7 +102,7 @@ sudo ./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 
 
 - 等待master节点均安装完毕，验证各个组件是否正常工作：在master-1节点执行如下命令
 ```
-/home/admin/local/bin/kubectl get cs
+sudo /home/admin/local/bin/kubectl get cs
 ```
 
 #### 3、安装node节点
