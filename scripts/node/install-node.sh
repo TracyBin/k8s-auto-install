@@ -40,7 +40,10 @@ function copy-certs() {
 	local SRC_DIR=${CURRENT_HOME}/k8s-auto-install/scripts;
 	mkdir -p ${SRC_DIR}/node/certs
 	kube-scp "${CURRENT_USER}@${MASTER_ADDRESS}:${SRC_DIR}/master/certs/*" "${SRC_DIR}/node/certs"
+	# 环境变量和kubeconfig文件一并从master拷贝到node节点
 	mv ${SRC_DIR}/node/certs/environment.sh ${CURRENT_DIR}/
+	mkdir -p /root/.kube
+	mv ${SRC_DIR}/node/certs/config /root/.kube/
 }
 
 function install-pre() {
@@ -79,6 +82,7 @@ function install-pre() {
 function modify-docker() {
 	echo "------------------------------------------------------------"
 	echo "modify docker service file ..."
+	sudo mkdir -p /data/docker
 cat <<EOF >/etc/systemd/system/docker.service
 [Unit]
 Description=Docker Application Container Engine
@@ -90,7 +94,7 @@ Type=notify
 # the default is not to use systemd for cgroups because the delegate issues still
 # exists and systemd currently does not support the cgroup feature set required
 # for containers run by docker
-ExecStart=/usr/bin/dockerd --host=tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled=false
+ExecStart=/usr/bin/dockerd --host=tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled=false --graph=/data/docker
 ExecReload=/bin/kill -s HUP $MAINPID
 # Having non-zero Limit*s causes performance problems due to accounting overhead
 # in the kernel. We recommend using cgroups to do container-local accounting.
@@ -268,7 +272,7 @@ do
 	    ;;
 		-b|--hostname)
 			export NODE_NAME=$2;
-			hostnamectl set-hostname ${NODE_NAME}
+			hostnamectl set-hostname --static ${NODE_NAME}
 			shift 2
 			;;
 		-c|--nodeip)  
@@ -294,8 +298,8 @@ done
 echo "------------------------------------------------------------"
 echo "Install kubelet,kube-proxy in Node:${NODE_ADDRESS},${NODE_NAME};MASTER_ADDRESS:${MASTER_ADDRESS}"
 echo "------------------------------------------------------------"
-install-pre
 modify-docker
+install-pre
 install-kubelet
 install-proxy
 

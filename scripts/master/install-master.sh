@@ -40,7 +40,7 @@ function install-pre() {
 	sed -e "s/\\\$MASTER_1/${MASTER_1}/g" -e "s/\\\$MASTER_2/${MASTER_2}/g" -e "s/\\\$MASTER_3/${MASTER_3}/g" -e "s|\$CURRENT_HOME|${CURRENT_HOME}|g" "${MASTER_ROOT}/environment.sh.sed" > ${MASTER_ROOT}/environment.sh
 	cp ${MASTER_ROOT}/environment.sh ${MASTER_ROOT}/certs/;
 	source ${MASTER_ROOT}/environment.sh
-	# load_image
+	load_image
 	echo "install pre success"
 	echo "------------------------------------------------------------"
 }
@@ -129,7 +129,7 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 	echo "证书已生成到certs目录，请拷贝certs目录到所有的安装服务器...."
 	echo "正在拷贝，请按照提示输入master服务器密码....."
 	provision-master 
-	echo "拷贝完成，暂停30秒，其他master服务同步执行此脚本...."
+	echo "拷贝完成，暂停120秒，其他master服务同步执行此脚本...."
 	sleep 30
 fi
 
@@ -282,6 +282,7 @@ kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/ss
 kubectl config set-credentials admin --client-certificate=/etc/kubernetes/ssl/admin.pem --embed-certs=true --client-key=/etc/kubernetes/ssl/admin-key.pem;
 kubectl config set-context kubernetes --cluster=kubernetes --user=admin;
 kubectl config use-context kubernetes
+cp /root/.kube/config ${MASTER_ROOT}/certs/;chmod 755 ${MASTER_ROOT}/certs/config
 echo "config kubectl success"
 echo "------------------------------------------------------------"
 }
@@ -414,6 +415,49 @@ EOF
 	echo "------------------------------------------------------------"
 }
 
+function modify-docker() {
+	echo "------------------------------------------------------------"
+	echo "modify docker service file ..."
+	sudo mkdir -p /data/docker
+cat <<EOF >/etc/systemd/system/docker.service
+[Unit]
+Description=Docker Application Container Engine
+Documentation=https://docs.docker.com
+After=network.target firewalld.service
+
+[Service]
+Type=notify
+# the default is not to use systemd for cgroups because the delegate issues still
+# exists and systemd currently does not support the cgroup feature set required
+# for containers run by docker
+ExecStart=/usr/bin/dockerd --host=tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled=false --graph=/data/docker
+ExecReload=/bin/kill -s HUP $MAINPID
+# Having non-zero Limit*s causes performance problems due to accounting overhead
+# in the kernel. We recommend using cgroups to do container-local accounting.
+LimitNOFILE=infinity
+LimitNPROC=infinity
+LimitCORE=infinity
+# Uncomment TasksMax if your systemd version supports it.
+# Only systemd 226 and above support this version.
+#TasksMax=infinity
+TimeoutStartSec=0
+# set delegate yes so that systemd does not reset the cgroups of docker containers
+Delegate=yes
+# kill only the docker process, not all processes in the cgroup
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+EOF
+	echo "start docker service ..."
+	systemctl daemon-reload
+	systemctl disable docker;systemctl enable docker
+	systemctl restart docker
+	iptables -P FORWARD ACCEPT
+	echo "modify docker success"
+	echo "------------------------------------------------------------"
+}
+
 function provision-master() {
 	local MASTERS=(${MASTER_2} ${MASTER_3})
 	echo `pwd`
@@ -478,7 +522,7 @@ do
 			;;
 		-d|--hostname)
 			export ETCD_NAME=$2;
-			hostnamectl set-hostname ${ETCD_NAME}
+			hostnamectl set-hostname --static ${ETCD_NAME}
 			shift 2
 			;;
 		-e|--ip)
@@ -501,6 +545,7 @@ do
 			;;
     esac
 done
+modify-docker
 install-pre
 make-cert
 echo "Install etcd apiserver controller-manage schedule in ${ETCD_NAME}, IP:${MASTER_ADDRESS},USER:${CURRENT_USER}"
