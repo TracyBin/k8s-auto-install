@@ -83,7 +83,7 @@ total 732192
 - 在master-1执行如下命令
 ```
 cd /home/admin/k8s-auto-install/scripts/master;
-./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-1 --ip 10.12.2.151
+./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-1 --ip 10.12.2.151 --user admin
 ```
 > 脚本执行过程中，会提示输入master-2和master-3节点admin用户的密码，输入密码后，会自动下发密钥和证书到master-2和master-3节点
 - 证书自动下发完毕后，master-1脚本执行会暂停30秒，等待master-2和master-3执行脚本
@@ -92,12 +92,12 @@ cd /home/admin/k8s-auto-install/scripts/master;
 
 ```
 cd /home/admin/k8s-auto-install/scripts/master;
-sudo ./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-2 --ip 10.12.2.152
+sudo ./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-2 --ip 10.12.2.152 --user admin
 ```
 
 ```
 cd /home/admin/k8s-auto-install/scripts/master;
-sudo ./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-3 --ip 10.12.2.153
+sudo ./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-3 --ip 10.12.2.153 --user admin
 ```
 
 - 等待master节点均安装完毕，验证各个组件是否正常工作：在master-1节点执行如下命令
