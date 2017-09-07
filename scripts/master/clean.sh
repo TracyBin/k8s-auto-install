@@ -2,7 +2,7 @@
 set -x
 INSTALL_ROOT=$(dirname "${BASH_SOURCE}")/../..
 readonly MASTER_ROOT=$(dirname "${BASH_SOURCE}}")
-
+CURRENT_HOME="/home/admin"
 KUBECTL="${CURRENT_HOME}/local/bin/kubectl"
 
 DNS=`eval "${KUBECTL} get pods -n kube-system |grep dns | cat"`

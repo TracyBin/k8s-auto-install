@@ -40,7 +40,7 @@ function install-pre() {
 	sed -e "s/\\\$MASTER_1/${MASTER_1}/g" -e "s/\\\$MASTER_2/${MASTER_2}/g" -e "s/\\\$MASTER_3/${MASTER_3}/g" -e "s|\$CURRENT_HOME|${CURRENT_HOME}|g" "${MASTER_ROOT}/environment.sh.sed" > ${MASTER_ROOT}/environment.sh
 	cp ${MASTER_ROOT}/environment.sh ${MASTER_ROOT}/certs/;
 	source ${MASTER_ROOT}/environment.sh
-	load_image
+	#load_image
 	echo "install pre success"
 	echo "------------------------------------------------------------"
 }
@@ -125,7 +125,7 @@ cat <<EOF  > etcd-csr.json
 }
 EOF
 cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes etcd-csr.json | cfssljson -bare etcd
-
+	sudo chmod 755 ca* etcd*.pem
 	echo "证书已生成到certs目录，请拷贝certs目录到所有的安装服务器...."
 	echo "正在拷贝，请按照提示输入master服务器密码....."
 	provision-master 
@@ -136,7 +136,7 @@ fi
 
 
 mkdir -p /etc/kubernetes/ssl /etc/etcd/ssl
-chmod 755 ca* etcd*.pem
+sudo chmod 755 ca* etcd*.pem
 cp ca* /etc/kubernetes/ssl
 cp etcd*.pem /etc/etcd/ssl;
 
