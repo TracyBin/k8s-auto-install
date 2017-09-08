@@ -68,6 +68,20 @@ function install-pre() {
 	systemctl disable firewalld;systemctl disable NetworkManager;
 	systemctl stop NetworkManager;systemctl stop firewalld;
 	
+	# 开启ipv4转发
+	if [ -z "`grep "net.ipv4.ip_forward"  /etc/sysctl.conf`" ]; then
+cat <<EOF  >> /etc/sysctl.conf
+net.ipv4.ip_forward = 1
+EOF
+    fi
+	
+	# centos7内核转发需要额外的设置
+	if [ -z "`grep "net.ipv4.ip_forward" /usr/lib/sysctl.d/50-default.conf`" ]; then
+cat <<EOF >> /usr/lib/sysctl.d/50-default.conf
+net.ipv4.ip_forward = 1
+EOF
+	fi
+	sysctl -p
 	load_image
 	
 	#拷贝证书

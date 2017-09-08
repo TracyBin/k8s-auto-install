@@ -28,11 +28,26 @@ function install-pre() {
 		usage
 		exit 1
 	fi
-	echo "disable firewalld NetworkManager"
+	echo "disable firewalld NetworkManager，iptables FORWARD ACCEPT,ipv4 forward"
 	setenforce 0;
 	iptables -P FORWARD ACCEPT;
 	systemctl disable firewalld;systemctl disable NetworkManager;
 	systemctl stop NetworkManager;systemctl stop firewalld;
+	
+	# 开启ipv4转发
+	if [ -z "`grep "net.ipv4.ip_forward"  /etc/sysctl.conf`" ]; then
+cat <<EOF  >> /etc/sysctl.conf
+net.ipv4.ip_forward = 1
+EOF
+    fi
+	
+	# centos7内核转发需要额外的设置
+	if [ -z "`grep "net.ipv4.ip_forward" /usr/lib/sysctl.d/50-default.conf`" ]; then
+cat <<EOF >> /usr/lib/sysctl.d/50-default.conf
+net.ipv4.ip_forward = 1
+EOF
+	fi
+	sysctl -p
 	
 	# 拷贝可执行文件到${CURRENT_HOME}/local/bin
 	mkdir -p ${MASTER_ROOT}/certs/;
@@ -41,6 +56,7 @@ function install-pre() {
 	cp ${MASTER_ROOT}/environment.sh ${MASTER_ROOT}/certs/;
 	source ${MASTER_ROOT}/environment.sh
 	#load_image
+	
 	echo "install pre success"
 	echo "------------------------------------------------------------"
 }
