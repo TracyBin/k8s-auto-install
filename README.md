@@ -1,8 +1,8 @@
-# k8s-auto-install
+# k8s-auto-install ----Asiainfo-CMC-JF
 > 根据k8s官方社区的centos版本的安装脚本，根据自己的需求和安装场景进行了改编，使kubernetes高可用环境能半自动化部署
-> 
+
 > 脚本安装完成后，所有的组件均使用TLS加密通信，部署架构为：三台master节点，N台node节点，master节点可与node节点合用
-> 
+
 > **所有的安装均以admin用户为例，有sudo权限**
 
 ### 安装前置条件
@@ -83,7 +83,7 @@ total 732192
 - 在master-1执行如下命令
 ```
 cd /home/admin/k8s-auto-install/scripts/master;
-./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-1 --ip 10.12.2.151
+./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-1 --ip 10.12.2.151 --user admin
 ```
 > 脚本执行过程中，会提示输入master-2和master-3节点admin用户的密码，输入密码后，会自动下发密钥和证书到master-2和master-3节点
 - 证书自动下发完毕后，master-1脚本执行会暂停30秒，等待master-2和master-3执行脚本
@@ -92,17 +92,17 @@ cd /home/admin/k8s-auto-install/scripts/master;
 
 ```
 cd /home/admin/k8s-auto-install/scripts/master;
-sudo ./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-2 --ip 10.12.2.152
+sudo ./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-2 --ip 10.12.2.152 --user admin
 ```
 
 ```
 cd /home/admin/k8s-auto-install/scripts/master;
-sudo ./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-3 --ip 10.12.2.153
+sudo ./install-master.sh  --master1 10.12.2.151 --master2 10.12.2.152 --master3 10.12.2.153 --hostname master-3 --ip 10.12.2.153 --user admin
 ```
 
 - 等待master节点均安装完毕，验证各个组件是否正常工作：在master-1节点执行如下命令
 ```
-/root/local/bin/kubectl get cs
+sudo /home/admin/local/bin/kubectl get cs
 ```
 
 #### 3、安装node节点
@@ -137,10 +137,10 @@ sudo ./install-addons.sh
 ```
 [admin@master-1 ~]$ sudo ./local/bin/kubectl get pods --all-namespaces -o wide
 NAMESPACE     NAME                                        READY     STATUS    RESTARTS   AGE       IP                NODE
-kube-system   calico-node-09t5k                           2/2       Running   0          1m        10.12.2.253       master-3
-kube-system   calico-node-hv35j                           2/2       Running   0          1m        10.12.2.245       master-1
-kube-system   calico-node-smkc9                           2/2       Running   0          1m        10.12.2.252       master-2
-kube-system   calico-policy-controller-1746561077-t3d6n   1/1       Running   0          1m        10.12.2.245       master-1
+kube-system   calico-node-09t5k                           2/2       Running   0          1m        10.12.2.153       master-3
+kube-system   calico-node-hv35j                           2/2       Running   0          1m        10.12.2.151       master-1
+kube-system   calico-node-smkc9                           2/2       Running   0          1m        10.12.2.152       master-2
+kube-system   calico-policy-controller-1746561077-t3d6n   1/1       Running   0          1m        10.12.2.151       master-1
 kube-system   heapster-2929994463-h75fd                   1/1       Running   0          1m        192.168.205.193   master-2
 kube-system   kube-dns-3119898146-ntt41                   3/3       Running   0          1m        192.168.39.2      master-1
 kube-system   kubernetes-dashboard-908585402-722s0        1/1       Running   0          1m        192.168.39.1      master-1
