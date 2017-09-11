@@ -82,7 +82,7 @@ net.ipv4.ip_forward = 1
 EOF
 	fi
 	sysctl -p
-	load_image
+	#load_image
 	
 	#拷贝证书
 	mkdir -p /etc/kubernetes/ssl

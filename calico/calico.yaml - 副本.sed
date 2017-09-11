@@ -1,7 +1,7 @@
-# Calico Version v2.4.1
-# https://docs.projectcalico.org/v2.4/releases#v2.4.1
+# Calico Version v2.5.0
+# https://docs.projectcalico.org/v2.5/releases#v2.5.0
 # This manifest includes the following component versions:
-#   calico/node:v2.4.1
+#   calico/node:v2.5.0
 #   calico/cni:v1.10.0
 #   calico/kube-policy-controller:v0.7.0
 
@@ -64,9 +64,12 @@ data:
   # not using TLS for etcd.
   # This self-hosted install expects three files with the following names.  The values
   # should be base64 encoded strings of the entire contents of each file.
-  etcd-key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBMEt3OUFhUW9NT1YrZWF4aUw2Q1Q0T2hPeDdUWm1yZmg3YWhYY0RzTkttbmk5M3FjCnRJQU5NNGkxVU5MbFB3R3BJcTF6a2N5bzR1MFlqWUdGdW1WY1UwZitZYWNHQ0s5cW5oMm5acThBN1pHSDZOdjcKNm85OFliaUkyaVdIQklFUmNJekhQOUlVaWJ2b0xQVVZhRmNlSThNbVg4Q3phTEp6YS93d1QrN2pSbEx6VEgxOApxc2FZK2Zmc3Q1ZkZHU1dJclpxYUdmYi8yc3ptSW55VStzc2E2MWdQTE11SHJqdFRBK1cvNU9SN1ArVzdXeVhjClh2ZHVkVi9EYmpnNU56dUwwKzNJdWZNeG1Qc0tzMW14U1lSMFo1ek83R21WQWF3RzcxWTM2djd6Q3lGdUc4T3UKR2ltOWJvM2xuQTVlVzQwZVUvMFJ3M2lnWVhCSXZWMjZWWWpCN3dJREFRQUJBb0lCQVFET3d5czd1aFZjeGJpNQpCUGJRN0ZJNmt0U2tpdXptb2ZjS0RqaDlhdldUcGhHUFYvMTMyRDI4WjJRSkxyNlozS0pqU3V4dGRoV05ySkljCmZFOHVMd3I1TmllM1NORHd3Q2RyZmtTRnVUZTVMZTgxNnV0Rk1tRnpUbTdEZ0ZXMVA5SXc3RHp0WHRLYzJ3U2wKcno1RUFiWktoeTQ1eUcyOGVyMWxMU0FOdzgyTXVoQlV1MW1PNVRNRE1OUjJ6M1BENEFqK3RNZ1cvRjhzN05KOApsTlA1TUpWTTNPV3V0RHJvOG84NFpudzVKV2NWQXpDeGYvd0VTR20yb0ZsK2FEc2FXSHc5NWprT3NiNjRGU0p4CmFvejlDZzNKUG9seTE2L0E0RUJwM0krZjRMaHdhRHpzTHRId0Zra2ZlcW5jMjBlRHdhOW9JYTBDcFF2RWJOZmwKaXAyWFBiTUpBb0dCQU9IczhuL0Y1YzJMaGNENnplMlU1Q2oxOHRkUUxpQW55QXVKcGVaaDRvL0VWeERXcyt2ZwpFNjNjTGdWTUJYTUhCNFdHMjlLdE5OYktYdUp6OXdBb1JiOUxJejlZUG5VNitnbEVlVXNLbHVNeWdTamdkTVV1ClRkZkJtSUNlOVlJMkhZOFF6TUR5ajZIUXZ0NklQTzR6WG9qaDFlRjlGamw2QitRK3lwb3I4Q0JsQW9HQkFPeHoKV3FtSGtyZldOUjA0TGFOekdXNWpQWGRIVmk4dXMwQS9SOURCMGJZOVlDUnNuR0xld2dZMTJoaGlzS0ZyNm1HYQpCUVN1eENoVmRhZ1phV2FPMkhGQjFRbi91N0U3SG9iNzBDemhIQUVKZVRwUWdBOEx1dzh6enZBYmhwWldwWUx0CkFSVExja0VuNFU2QmJjU1Nxb3BTVHBkVU1haHdSd2tmWk9maURmSERBb0dCQU5Rb05ZVWxhdXE5bGNvbCs5R2EKV3pQWDJzYTFCY3V1YjkzZDBndnBhZCtHQ2hqRzlraVBzUXM0VTRNbjQ0b2tWTHpnYW5lSnJhL3lkRzRGWmpNZwpubmJIOFg2ZnVHOVFCZE5FR1A4T0g2bVZHTk14REpiS0o5RnZmRzEwV0txQmRQcVBWU2Z2NEUrZGZrL3M4Z0xoCi9HbGdZZ0FRL2hqVmJxbTVDWHNEdmNnOUFvR0JBTVZnaWJib24vWHJ6d3lrSDV6SWNOc3Y1bGhTYVVRYmxMQTEKNHNvRmNQelNnUllHd0FqY2NGUmswYmozY1FCZXFCbHZTMjhjUUV4M0FpOGZmMWVJT0c5YWgrNi8xanJjNGQvRwpCb0hnSzlORnlEZUFpVldGOGxGL2F1Z040aXhQQ2Z5ZndQNU4wZ05IdWhFaGc3TEt4NmVOaTJOUmVkNWtVemZ2ClIvazFQM1NuQW9HQVhUTWErYnV5bW1oSWNEb280WUtCbTVvTDZ3NzZUbFhNa3NHMlBhMTB3Nk5qTE9mMysyemMKa0VqNWZtbzQ1RGJDRTZkZ2RrSlZlMm5EZUJnejQ4VjRQM2xuYjJsOGl6MkpjVk4vTUVML0UzQnB5UmRjbXZiUgowT0RDS1BrMzR4Z08zZmJTM2JJQVhHdSt4OUxtb3IrdmxMUmk5OXNtL1E5VWRDOURUOEQvRzg4PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
-  etcd-cert: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQ5akNDQXQ2Z0F3SUJBZ0lVYjkyV3NmRDhpOVhjRVJFZkNoUmNBVUVKSHFjd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNRMDR4RURBT0JnTlZCQWdUQjBKbGFVcHBibWN4RURBT0JnTlZCQWNUQjBKbAphVXBwYm1jeEREQUtCZ05WQkFvVEEyczRjekVQTUEwR0ExVUVDeE1HVTNsemRHVnRNUk13RVFZRFZRUURFd3ByCmRXSmxjbTVsZEdWek1CNFhEVEUzTURneE56QTVNamt3TUZvWERURTRNRGd4TnpBNU1qa3dNRm93WHpFTE1Ba0cKQTFVRUJoTUNRMDR4RURBT0JnTlZCQWdUQjBKbGFVcHBibWN4RURBT0JnTlZCQWNUQjBKbGFVcHBibWN4RERBSwpCZ05WQkFvVEEyczRjekVQTUEwR0ExVUVDeE1HVTNsemRHVnRNUTB3Q3dZRFZRUURFd1JsZEdOa01JSUJJakFOCkJna3Foa2lHOXcwQkFRRUZBQU9DQVE4QU1JSUJDZ0tDQVFFQTBLdzlBYVFvTU9WK2VheGlMNkNUNE9oT3g3VFoKbXJmaDdhaFhjRHNOS21uaTkzcWN0SUFOTTRpMVVOTGxQd0dwSXExemtjeW80dTBZallHRnVtVmNVMGYrWWFjRwpDSzlxbmgyblpxOEE3WkdINk52NzZvOThZYmlJMmlXSEJJRVJjSXpIUDlJVWlidm9MUFVWYUZjZUk4TW1YOEN6CmFMSnphL3d3VCs3alJsTHpUSDE4cXNhWStmZnN0NWZGR1NXSXJacWFHZmIvMnN6bUlueVUrc3NhNjFnUExNdUgKcmp0VEErVy81T1I3UCtXN1d5WGNYdmR1ZFYvRGJqZzVOenVMMCszSXVmTXhtUHNLczFteFNZUjBaNXpPN0dtVgpBYXdHNzFZMzZ2N3pDeUZ1RzhPdUdpbTlibzNsbkE1ZVc0MGVVLzBSdzNpZ1lYQkl2VjI2VllqQjd3SURBUUFCCm80R2pNSUdnTUE0R0ExVWREd0VCL3dRRUF3SUZvREFkQmdOVkhTVUVGakFVQmdnckJnRUZCUWNEQVFZSUt3WUIKQlFVSEF3SXdEQVlEVlIwVEFRSC9CQUl3QURBZEJnTlZIUTRFRmdRVTNhS0FaTGdRTUJHa2VNM2V2cFNiR2hBbQpiTnd3SHdZRFZSMGpCQmd3Rm9BVS8zdVdxQ0J0MXV6RUUvQTlsNmYxVFJKSmVCMHdJUVlEVlIwUkJCb3dHSWNFCmZ3QUFBWWNFQ2d3Qys0Y0VDZ3dDOW9jRUNnd0MrREFOQmdrcWhraUc5dzBCQVFzRkFBT0NBUUVBRU5ONFdxWWIKZ3RqeEN5UkpEVXJIWndnQ0FVM2tDUkJnQTZ2VVNJQnFoY3gvNU0yR2xIVEdkNkM5aGlwQzhYWXVXY0xDTklCeQpsMnN3REwwWHAxZXhwZyt6UzJSSEE2SkhXV0RyNjc5R25WYVBKRTI3bmVrdkJ6aUZLSklsVDljdnFnOWYvY2VjCmJNMW5mckFJM1FNaTYrNTA2MlBhTTByWGxXYVFDa0pNQjVETEdKZHdkZzAydTg5cmlHV0drM1VXbTdQYmVOOFQKYnhGeFZkQzVRc3FneUluSkFSU3lrbjZaY25VRGZaTEVxaHNpMk1QQ0NVaFFCVXJiOERMRWd5Ynd3VU1Gem9yKwpPNUU4VU16MDdWRnBNclZTd2JRbFUrQmdwYUUrcUQ3SkxrSktvTzl5cHNqVjV5Zm9Wa1JxenRibTVDbDZZSDV5CjRpMzJaeWsrWFFkL2h3PT0KLS0tLS1FTkQgQ0VSVElGSUNBVEUtLS0tLQo=
-  etcd-ca: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUR2akNDQXFhZ0F3SUJBZ0lVVmcvc1RQRVo5UC9FbDZLZlpkNUQ4T1dLQWVjd0RRWUpLb1pJaHZjTkFRRUwKQlFBd1pURUxNQWtHQTFVRUJoTUNRMDR4RURBT0JnTlZCQWdUQjBKbGFVcHBibWN4RURBT0JnTlZCQWNUQjBKbAphVXBwYm1jeEREQUtCZ05WQkFvVEEyczRjekVQTUEwR0ExVUVDeE1HVTNsemRHVnRNUk13RVFZRFZRUURFd3ByCmRXSmxjbTVsZEdWek1CNFhEVEUzTURneE56QTNNRE13TUZvWERUSXlNRGd4TmpBM01ETXdNRm93WlRFTE1Ba0cKQTFVRUJoTUNRMDR4RURBT0JnTlZCQWdUQjBKbGFVcHBibWN4RURBT0JnTlZCQWNUQjBKbGFVcHBibWN4RERBSwpCZ05WQkFvVEEyczRjekVQTUEwR0ExVUVDeE1HVTNsemRHVnRNUk13RVFZRFZRUURFd3ByZFdKbGNtNWxkR1Z6Ck1JSUJJakFOQmdrcWhraUc5dzBCQVFFRkFBT0NBUThBTUlJQkNnS0NBUUVBczhQUUQydnJBZWNLczZMUWpQQ3kKUUxOMTFMZUhGT0pTUUJrUXp2T1RDREZCZ1pCQ00xSFA5UllobWlTQTJnQUJyTUR2c0o0WWN6TGJxbWFwbm1vNgpJdldFWnJWZ3NCWEU1cUtmM1BmNG9VVmJlUm9lbjIwMTZsU0dEWDBzOU10RXdkS29KOGFXQXlYT0NCcFFUeDFaCksxZWRwZXVNM0tEcVVIT0tGaEk2R0pTUlNMSjFxZlh4OWMrMGsyc091dERXT2RLdVlRN3pGVU9uL1JDbmVQc1YKWXRZUTNzL0pvZTZrV2QySElJMlNiV2c3VkhyVGRQMDA3dTlmanc3ZHZ4R3cyZjA0emJuVmM3WnY0UzZVVWhMcApKbHdFOEtCNGhlWU4velRxdHpXaE80TzVTTDlwNUlNVVR1WUlUSHVLeENjbFZib2wybC92dE5nNWZrMnd1MXE4CnJRSURBUUFCbzJZd1pEQU9CZ05WSFE4QkFmOEVCQU1DQVFZd0VnWURWUjBUQVFIL0JBZ3dCZ0VCL3dJQkFqQWQKQmdOVkhRNEVGZ1FVLzN1V3FDQnQxdXpFRS9BOWw2ZjFUUkpKZUIwd0h3WURWUjBqQkJnd0ZvQVUvM3VXcUNCdAoxdXpFRS9BOWw2ZjFUUkpKZUIwd0RRWUpLb1pJaHZjTkFRRUxCUUFEZ2dFQkFKei9pTW1XV3Zlc0hzWUlBZ01CClJySkNpa1ZkTGJVSkhscG5COElwTEN4Zy9SMDFYNVdPaVBmOEowYU1Od3EwSjhBMWZQOHcrdjkvdXo4VGsycmgKaSt1SS9XK1FXek5qQktuaWxsaDBHbzUvN2lNWUZXSWxrZGVwOXpDQW9qQVJvazNWcXdaY2trK2lBakc4ZklDSworOTc5RXh6bmhmZ1ZZZXc3Yy8vUmxBUCtFY0tLRUdKRFI5Y1lLcGw1d1RQbTgvbTVxampNL1ZyTTFLanhRb2pBCkhHWlp1Si9IOURpV3JnL0NPMElOYlI4QWlVTlBVdUFINVcvSEVkdWRvb1dGRCtNcmVqMnEzWTBJQlRTUE01b0wKeDYyTUV5bGNKV3hKRUlOb2VVRUFxeTNsMWRxQzdDdEIxWFhhWldsRTRGbUdiS2xVUzF0amRWNXo5VStzVU5VNgp6dkk9Ci0tLS0tRU5EIENFUlRJRklDQVRFLS0tLS0K
+  #etcd-key: (cat /etc/kubernetes/ssl/etcd-key.pem | base64 | tr -d '\n')
+  #etcd-cert: (cat /etc/kubernetes/ssl/etcd.pem | base64 | tr -d '\n')
+  #etcd-ca: (cat /etc/kubernetes/ssl/ca.pem | base64 | tr -d '\n')
+  etcd-key: $ETCD_KEY_BASE64
+  etcd-cert: $ETCD_CERT_BASE64
+  etcd-ca: $ETCD_CA_BASE64
 
 ---
 
@@ -95,13 +98,18 @@ spec:
            {"key":"CriticalAddonsOnly", "operator":"Exists"}]
     spec:
       hostNetwork: true
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Equal
+          value: master
+          effect: NoSchedule
       serviceAccountName: calico-node
       containers:
         # Runs calico/node container on each Kubernetes node.  This
         # container programs network policy and routes on each
         # host.
         - name: calico-node
-          image: quay.io/calico/node:v2.4.1
+          image: calico/node:v2.5.0
           env:
             # The location of the Calico etcd cluster.
             - name: ETCD_ENDPOINTS
@@ -138,8 +146,6 @@ spec:
             # Set MTU for tunnel device used if ipip is enabled
             - name: FELIX_IPINIPMTU
               value: "1440"
-            - name: FELIX_HEALTHENABLED
-              value: "true"
             # Location of the CA certificate for etcd.
             - name: ETCD_CA_CERT_FILE
               valueFrom:
@@ -161,6 +167,8 @@ spec:
             # Auto-detect the BGP IP address.
             - name: IP
               value: ""
+            - name: FELIX_HEALTHENABLED
+              value: "true"
           securityContext:
             privileged: true
           resources:
@@ -190,7 +198,7 @@ spec:
         # This container installs the Calico CNI binaries
         # and CNI network config file on each node.
         - name: install-cni
-          image: quay.io/calico/cni:v1.10.0
+          image: calico/cni:v1.10.0
           command: ["/install-cni.sh"]
           env:
             # The location of the Calico etcd cluster.
@@ -263,10 +271,15 @@ spec:
       # The policy controller must run in the host network namespace so that
       # it isn't governed by policy that would prevent it from working.
       hostNetwork: true
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Equal
+          value: master
+          effect: NoSchedule
       serviceAccountName: calico-policy-controller
       containers:
         - name: calico-policy-controller
-          image: quay.io/calico/kube-policy-controller:v0.7.0
+          image: calico/kube-policy-controller:v0.7.0
           env:
             # The location of the Calico etcd cluster.
             - name: ETCD_ENDPOINTS

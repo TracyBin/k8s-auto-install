@@ -636,7 +636,6 @@ function kube-scp() {
 
 function install-calico() {
 	echo "------------------------------------------------------------"
-	#load_image
 	echo "begin install calico"
 	if [ "$MASTER1" ]; then
 		echo "install calico......"
@@ -663,14 +662,15 @@ function install-calico() {
 
 # 后置条件
 function install-after() {
+	load_image
 	if [ "$MASTER1" ]; then
 		echo "wait other master for loading images and sleep 30s,then approve csr and cordon all master"
-		sleep 10
+		sleep 30
 		${KUBECTL} get csr|awk 'NR!=1{print $1}'|xargs ${KUBECTL} certificate approve
-		#sleep 10
-		# ${KUBECTL} taint nodes master-1 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
-		# ${KUBECTL} taint nodes master-2 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
-		# ${KUBECTL} taint nodes master-3 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
+		sleep 10
+		${KUBECTL} taint nodes master-1 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
+		${KUBECTL} taint nodes master-2 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
+		${KUBECTL} taint nodes master-3 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
 		#${KUBECTL} cordon master-1
 		#${KUBECTL} cordon master-2
 		#${KUBECTL} cordon master-3
@@ -745,7 +745,7 @@ kubectl-util
 install-apiserver
 install-controller
 install-scheduler
-#install-kubelet
-#install-proxy
-#install-calico
+install-kubelet
+install-proxy
 install-after
+install-calico
