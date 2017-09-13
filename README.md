@@ -3,7 +3,7 @@
 - 在master节点安装kubelet和kube-proxy(因heapster数据均通过apiserver代理获取，所以master节点需和pod网络打通，所以需要安装kubelet来管理calico容器)
 - 增加日志EFK的部署
 
-> 根据k8s官方社区的centos版本的安装脚本，根据自己的需求和安装场景进行了改编，使kubernetes高可用环境能半自动化部署
+> 以k8s官方社区的centos版本的安装脚本为蓝本，根据自己的需求和安装场景进行了改编，使kubernetes高可用环境能半自动化部署
 
 > 脚本安装完成后，所有的组件均使用TLS加密通信，部署架构为：三台master节点，N台node节点，master节点可与node节点合用
 
@@ -131,7 +131,7 @@ certificatesigningrequest "csr-p26bb" approved
 certificatesigningrequest "csr-z4vz8" approved
 ```
 
-#### 4、安装dns、dashboard、calico、heapster插件
+#### 4、安装dns、dashboard、calico、heapster、EFK插件
 ```
 cd /home/admin/k8s-auto-install/scripts/master;
 sudo ./install-addons.sh
