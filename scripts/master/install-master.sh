@@ -92,7 +92,7 @@ cat <<EOF > ca-config.json
 	}
 }
 EOF
-
+#############################
 echo "generate ca-csr"
 # 生成CA签名请求
 cat <<EOF >ca-csr.json
@@ -115,7 +115,7 @@ cat <<EOF >ca-csr.json
 EOF
 cfssl gencert -initca ca-csr.json | cfssljson -bare ca
 
-
+###################################
 cat <<EOF  > etcd-csr.json
 {
 	"CN": "etcd",
@@ -140,7 +140,7 @@ cat <<EOF  > etcd-csr.json
 	]
 }
 EOF
-cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes etcd-csr.json | cfssljson -bare etcd
+	cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kubernetes etcd-csr.json | cfssljson -bare etcd
 	sudo chmod 755 ca* etcd*.pem
 	echo "证书已生成到certs目录，请拷贝certs目录到所有的安装服务器...."
 	echo "正在拷贝，请按照提示输入master服务器密码....."
@@ -149,14 +149,13 @@ cfssl gencert -ca=ca.pem -ca-key=ca-key.pem -config=ca-config.json -profile=kube
 	sleep 10
 fi
 
-
+###################################
 
 mkdir -p /etc/kubernetes/ssl /etc/etcd/ssl
-sudo chmod 755 ca* etcd*.pem
 cp ca* /etc/kubernetes/ssl
 cp etcd*.pem /etc/etcd/ssl;
 
-
+##################################
 echo "generate kubernetes certs"
 # 创建 kubernetes 证书
 cat <<EOF > kubernetes-csr.json 
@@ -199,6 +198,8 @@ ${BOOTSTRAP_TOKEN},kubelet-bootstrap,10001,"system:kubelet-bootstrap"
 EOF
 
 mv token.csv /etc/kubernetes/
+# 修改权限，否则node节点scp没有权限
+chmod 755 *
 
 # 回到${MASTER_ROOT}目录下
 cd ../;
@@ -270,7 +271,6 @@ EOF
 function kubectl-util() {
 	echo "------------------------------------------------------------"
 	echo "config kubectl"
-	KUBE_APISERVER="https://${MASTER_ADDRESS}:6443"
 cat > admin-csr.json <<EOF
 {
 	"CN": "admin",
@@ -309,21 +309,23 @@ echo "------------------------------------------------------------"
 function install-kubelet() {
 	echo "------------------------------------------------------------"
 	echo "install kubelet..."
-	DNS_SERVER_IP=${CLUSTER_DNS_SVC_IP}
-	DNS_DOMAIN=${CLUSTER_DNS_DOMAIN}
-	
 	if [ "${MASTER1}" ]; then
 		CLUSTER_ROLE_BIND=`eval kubectl get clusterrolebinding/kubelet-bootstrap | cat`
 		if [ ! "${CLUSTER_ROLE_BIND}" ]; then
 			kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
 		fi
 	fi
+	DNS_SERVER_IP=${CLUSTER_DNS_SVC_IP}
+	DNS_DOMAIN=${CLUSTER_DNS_DOMAIN}
+
+	##################################
+	echo "generate kubelet certs"
 	kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/ssl/ca.pem --embed-certs=true --server=${KUBE_APISERVER} --kubeconfig=bootstrap.kubeconfig;
 	kubectl config set-credentials kubelet-bootstrap --token=${BOOTSTRAP_TOKEN} --kubeconfig=bootstrap.kubeconfig;
 	kubectl config set-context default --cluster=kubernetes  --user=kubelet-bootstrap --kubeconfig=bootstrap.kubeconfig;
 	kubectl config use-context default --kubeconfig=bootstrap.kubeconfig;
 	mv bootstrap.kubeconfig /etc/kubernetes/
-
+	
 	mkdir -p /var/lib/kubelet;
 cat <<EOF > /etc/systemd/system/kubelet.service
 [Unit]
@@ -378,7 +380,9 @@ EOF
 function install-proxy() {
 	echo "------------------------------------------------------------"
 	echo "install kube-proxy..."
-cat <<EOF > kube-proxy-csr.json 
+	##################################
+	echo "generate kube-proxy certs"
+cat <<EOF > kube-proxy-csr.json
 {
 	"CN": "system:kube-proxy",
 	"hosts": [],
@@ -397,16 +401,16 @@ cat <<EOF > kube-proxy-csr.json
 	]
 }
 EOF
-
 cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem -ca-key=/etc/kubernetes/ssl/ca-key.pem  -config=/etc/kubernetes/ssl/ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy;
 mv kube-proxy*.pem /etc/kubernetes/ssl/;
 rm -f  kube-proxy.csr kube-proxy-csr.json
-	
+
 kubectl config set-cluster kubernetes  --certificate-authority=/etc/kubernetes/ssl/ca.pem --embed-certs=true --server=${KUBE_APISERVER} --kubeconfig=kube-proxy.kubeconfig;
 kubectl config set-credentials kube-proxy --client-certificate=/etc/kubernetes/ssl/kube-proxy.pem  --client-key=/etc/kubernetes/ssl/kube-proxy-key.pem --embed-certs=true --kubeconfig=kube-proxy.kubeconfig;
 kubectl config set-context default --cluster=kubernetes --user=kube-proxy --kubeconfig=kube-proxy.kubeconfig;kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig;
 mv kube-proxy.kubeconfig /etc/kubernetes/
-	
+#################################
+
 mkdir -p /var/lib/kube-proxy;
 cat <<EOF > /etc/systemd/system/kube-proxy.service 
 [Unit]
@@ -636,7 +640,7 @@ function kube-scp() {
 
 function install-calico() {
 	echo "------------------------------------------------------------"
-	#load_image
+	load_image
 	echo "begin install calico"
 	if [ "$MASTER1" ]; then
 		echo "install calico......"
@@ -666,11 +670,11 @@ function install-after() {
 	if [ "$MASTER1" ]; then
 		echo "wait other master for loading images and sleep 30s,then approve csr and cordon all master"
 		sleep 10
-		${KUBECTL} get csr|awk 'NR!=1{print $1}'|xargs ${KUBECTL} certificate approve
-		#sleep 10
-		# ${KUBECTL} taint nodes master-1 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
-		# ${KUBECTL} taint nodes master-2 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
-		# ${KUBECTL} taint nodes master-3 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
+		${KUBECTL} get csr| grep Pending | awk '{print $1}' | xargs ${KUBECTL} certificate approve
+		sleep 10
+		${KUBECTL} taint nodes master-1 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
+		${KUBECTL} taint nodes master-2 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
+		${KUBECTL} taint nodes master-3 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
 		#${KUBECTL} cordon master-1
 		#${KUBECTL} cordon master-2
 		#${KUBECTL} cordon master-3
@@ -716,6 +720,7 @@ do
 			;;
 		-e|--ip)
 			export MASTER_ADDRESS=$2;
+			export KUBE_APISERVER="https://${MASTER_ADDRESS}:6443"
 			shift 2
 			;;
 		-f|--user)
@@ -745,7 +750,7 @@ kubectl-util
 install-apiserver
 install-controller
 install-scheduler
-#install-kubelet
-#install-proxy
-#install-calico
+install-kubelet
+install-proxy
+install-calico
 install-after

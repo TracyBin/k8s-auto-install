@@ -98,6 +98,11 @@ spec:
            {"key":"CriticalAddonsOnly", "operator":"Exists"}]
     spec:
       hostNetwork: true
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Equal
+          value: "master"
+          effect: NoSchedule
       serviceAccountName: calico-node
       containers:
         # Runs calico/node container on each Kubernetes node.  This
@@ -266,6 +271,11 @@ spec:
       # The policy controller must run in the host network namespace so that
       # it isn't governed by policy that would prevent it from working.
       hostNetwork: true
+      tolerations:
+        - key: node-role.kubernetes.io/master
+          operator: Equal
+          value: "master"
+          effect: NoSchedule
       serviceAccountName: calico-policy-controller
       containers:
         - name: calico-policy-controller

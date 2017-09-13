@@ -1,4 +1,8 @@
 # k8s-auto-install ----Asiainfo-CMC-JF
+> 当前版本为release-1.1分支。增加如下功能
+- 在master节点安装kubelet和kube-proxy(因heapster数据均通过apiserver代理获取，所以master节点需和pod网络打通，所以需要安装kubelet来管理calico容器)
+- 增加日志EFK的部署
+
 > 根据k8s官方社区的centos版本的安装脚本，根据自己的需求和安装场景进行了改编，使kubernetes高可用环境能半自动化部署
 
 > 脚本安装完成后，所有的组件均使用TLS加密通信，部署架构为：三台master节点，N台node节点，master节点可与node节点合用
@@ -146,3 +150,10 @@ kube-system   kube-dns-3119898146-ntt41                   3/3       Running   0 
 kube-system   kubernetes-dashboard-908585402-722s0        1/1       Running   0          1m        192.168.39.1      master-1
 kube-system   monitoring-influxdb-3324367400-x31jr        1/1       Running   0          1m        192.168.39.3      master-1
 ```
+
+##### 错误排查
+#### kubelet无法启动，报错类型为x509证书过期或无效
+> 原因及解决方法: 同步所有节点的时间，保持一致时间，最好是配置统一ntp服务器
+#### calico  node无法启动
+> 查看容器日志，发现pod容器启动报错,报错为"exec format error"。此类型错误为docker和linux内核问题，多半是由于修改了docker的启动参数--graph，改变了docker的默认存储位置导致。
+

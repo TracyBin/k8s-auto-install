@@ -38,12 +38,16 @@ function kube-scp() {
 
 function copy-certs() {
 	local SRC_DIR=${CURRENT_HOME}/k8s-auto-install/scripts;
-	mkdir -p ${SRC_DIR}/node/certs
+	mkdir -p ${SRC_DIR}/node/certs /root/.kube /etc/kubernetes/ssl
 	kube-scp "${CURRENT_USER}@${MASTER_ADDRESS}:${SRC_DIR}/master/certs/*" "${SRC_DIR}/node/certs"
 	# 环境变量和kubeconfig文件一并从master拷贝到node节点
 	mv ${SRC_DIR}/node/certs/environment.sh ${CURRENT_DIR}/
-	mkdir -p /root/.kube
 	mv ${SRC_DIR}/node/certs/config /root/.kube/
+	# CA证书由master节点生成，分发到node节点
+	cp ${SRC_DIR}/node/certs/ca* /etc/kubernetes/ssl
+	# kube-proxy和kubelet证书统一从master节点生成，分发到node节点
+	#cp ${SRC_DIR}/node/certs/kube-proxy*.pem /etc/kubernetes/ssl/;
+	#cp ${SRC_DIR}/node/certs/kube-proxy.kubeconfig /etc/kubernetes/;
 }
 
 function install-pre() {
@@ -55,7 +59,7 @@ function install-pre() {
 		exit 1
 	fi
 	
-	# 拷贝master节点环境变量
+	# 拷贝master节点环境变量和各个组件证书到node节点
 	copy-certs
 	# 执行环境变量
 	chmod +x ${CURRENT_DIR}/environment.sh
@@ -82,11 +86,7 @@ net.ipv4.ip_forward = 1
 EOF
 	fi
 	sysctl -p
-	#load_image
-	
-	#拷贝证书
-	mkdir -p /etc/kubernetes/ssl
-	cp ${CURRENT_DIR}/../node/certs/ca* /etc/kubernetes/ssl
+	load_image
 	
 	echo "the precondition success"
 	echo "------------------------------------------------------------"
@@ -96,19 +96,18 @@ EOF
 function modify-docker() {
 	echo "------------------------------------------------------------"
 	echo "modify docker service file ..."
-	sudo mkdir -p /data/docker
+	#sudo mkdir -p /data/docker
 cat <<EOF >/etc/systemd/system/docker.service
 [Unit]
 Description=Docker Application Container Engine
 Documentation=https://docs.docker.com
 After=network.target firewalld.service
-
 [Service]
 Type=notify
 # the default is not to use systemd for cgroups because the delegate issues still
 # exists and systemd currently does not support the cgroup feature set required
 # for containers run by docker
-ExecStart=/usr/bin/dockerd --host=tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled=false --graph=/data/docker
+ExecStart=/usr/bin/dockerd --host=tcp://0.0.0.0:2375 -H unix:///var/run/docker.sock --selinux-enabled=false
 ExecReload=/bin/kill -s HUP $MAINPID
 # Having non-zero Limit*s causes performance problems due to accounting overhead
 # in the kernel. We recommend using cgroups to do container-local accounting.
@@ -123,7 +122,6 @@ TimeoutStartSec=0
 Delegate=yes
 # kill only the docker process, not all processes in the cgroup
 KillMode=process
-
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -143,10 +141,10 @@ function install-kubelet() {
 	DNS_SERVER_IP=${CLUSTER_DNS_SVC_IP}
 	DNS_DOMAIN=${CLUSTER_DNS_DOMAIN}
 	
-	CLUSTER_ROLE_BIND=`eval kubectl get clusterrolebinding/kubelet-bootstrap | cat`
-	if [ ! "${CLUSTER_ROLE_BIND}" ]; then
-		kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
-	fi
+	#CLUSTER_ROLE_BIND=`eval kubectl get clusterrolebinding/kubelet-bootstrap | cat`
+	#if [ ! "${CLUSTER_ROLE_BIND}" ]; then
+	#	kubectl create clusterrolebinding kubelet-bootstrap --clusterrole=system:node-bootstrapper --user=kubelet-bootstrap
+	#fi
 	kubectl config set-cluster kubernetes --certificate-authority=/etc/kubernetes/ssl/ca.pem --embed-certs=true --server=${KUBE_APISERVER} --kubeconfig=bootstrap.kubeconfig;
 	kubectl config set-credentials kubelet-bootstrap --token=${BOOTSTRAP_TOKEN} --kubeconfig=bootstrap.kubeconfig;
 	kubectl config set-context default --cluster=kubernetes  --user=kubelet-bootstrap --kubeconfig=bootstrap.kubeconfig;
@@ -160,7 +158,6 @@ Description=Kubernetes Kubelet
 Documentation=http://github.com/GoogleCloudPlatform/kubernetes
 After=docker.service
 Requires=docker.service
-
 [Service]
 WorkingDirectory=/var/lib/kubelet
 ExecStart=${CURRENT_HOME}/local/bin/kubelet \
@@ -187,7 +184,6 @@ ExecStopPost=/sbin/iptables -A INPUT -s 192.168.0.0/16 -p tcp --dport 4194 -j AC
 ExecStopPost=/sbin/iptables -A INPUT -p tcp --dport 4194 -j DROP
 Restart=on-failure
 RestartSec=5
-
 [Install]
 WantedBy=multi-user.target
 EOF
@@ -207,7 +203,9 @@ EOF
 function install-proxy() {
 	echo "------------------------------------------------------------"
 	echo "install kube-proxy..."
-cat <<EOF > kube-proxy-csr.json 
+	##################################
+echo "generate kube-proxy certs"
+cat <<EOF > kube-proxy-csr.json
 {
 	"CN": "system:kube-proxy",
 	"hosts": [],
@@ -226,16 +224,16 @@ cat <<EOF > kube-proxy-csr.json
 	]
 }
 EOF
-
 cfssl gencert -ca=/etc/kubernetes/ssl/ca.pem -ca-key=/etc/kubernetes/ssl/ca-key.pem  -config=/etc/kubernetes/ssl/ca-config.json -profile=kubernetes kube-proxy-csr.json | cfssljson -bare kube-proxy;
 mv kube-proxy*.pem /etc/kubernetes/ssl/;
 rm -f  kube-proxy.csr kube-proxy-csr.json
-	
+
 kubectl config set-cluster kubernetes  --certificate-authority=/etc/kubernetes/ssl/ca.pem --embed-certs=true --server=${KUBE_APISERVER} --kubeconfig=kube-proxy.kubeconfig;
 kubectl config set-credentials kube-proxy --client-certificate=/etc/kubernetes/ssl/kube-proxy.pem  --client-key=/etc/kubernetes/ssl/kube-proxy-key.pem --embed-certs=true --kubeconfig=kube-proxy.kubeconfig;
 kubectl config set-context default --cluster=kubernetes --user=kube-proxy --kubeconfig=kube-proxy.kubeconfig;kubectl config use-context default --kubeconfig=kube-proxy.kubeconfig;
 mv kube-proxy.kubeconfig /etc/kubernetes/
-	
+#################################
+
 mkdir -p /var/lib/kube-proxy;
 cat <<EOF > /etc/systemd/system/kube-proxy.service 
 [Unit]
@@ -316,7 +314,3 @@ modify-docker
 install-pre
 install-kubelet
 install-proxy
-
-
-
-

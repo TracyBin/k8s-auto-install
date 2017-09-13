@@ -8,6 +8,29 @@ readonly MASTER_ROOT=$(dirname "${BASH_SOURCE}}")
 source ${MASTER_ROOT}/environment.sh
 KUBECTL="${CURRENT_HOME}/local/bin/kubectl"
 
+function install-efk() {
+	echo "------------------------------------------------------------"
+	echo "install efk"
+	nodes=`sudo ${KUBECTL} get nodes|awk 'NR!=1{print $1}'`
+	for node in nodes
+	do
+		${KUBECTL} label nodes $node beta.kubernetes.io/fluentd-ds-ready=true
+	done
+	EFK=`eval "${KUBECTL} get pods -n kube-system |grep elasticsearch | cat"`
+	if [ ! "${EFK}" ]; then
+		${KUBECTL} create -f ${INSTALL_ROOT}/EFK/es-controller.yaml
+		${KUBECTL} create -f ${INSTALL_ROOT}/EFK/es-rbac.yaml
+		${KUBECTL} create -f ${INSTALL_ROOT}/EFK/es-service.yaml
+		${KUBECTL} create -f ${INSTALL_ROOT}/EFK/fluentd-es-ds.yaml
+		${KUBECTL} create -f ${INSTALL_ROOT}/EFK/fluentd-es-rbac.yaml
+		${KUBECTL} create -f ${INSTALL_ROOT}/EFK/kibana-controller.yaml
+		${KUBECTL} create -f ${INSTALL_ROOT}/EFK/kibana-service.yaml
+		echo "EFK is successfully deployed."
+	else
+		echo "EFK is already deployed. Skipping."
+	fi
+	echo "------------------------------------------------------------"
+}
 
 
 function install-calico() {
@@ -77,11 +100,11 @@ function install-heapster() {
 	echo "------------------------------------------------------------"
 }
 
-install-calico
+#install-calico
 install-dns
 install-dashboard
 install-heapster
-
+install-efk
 
 
 
