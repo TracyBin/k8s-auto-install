@@ -667,19 +667,19 @@ function install-calico() {
 
 # 后置条件
 function install-after() {
+	sleep 10
+	${KUBECTL} taint nodes ${ETCD_NAME} node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
+	${KUBECTL} label nodes ${ETCD_NAME} node-role.kubernetes.io/master=master
 	if [ "$MASTER1" ]; then
 		echo "wait other master for loading images and sleep 30s,then approve csr and cordon all master"
 		sleep 10
 		${KUBECTL} get csr| grep Pending | awk '{print $1}' | xargs ${KUBECTL} certificate approve
-		sleep 10
-		${KUBECTL} taint nodes master-1 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
-		${KUBECTL} taint nodes master-2 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
-		${KUBECTL} taint nodes master-3 node-role.kubernetes.io/master=master:NoSchedule  --overwrite=true
+		
 		#${KUBECTL} cordon master-1
 		#${KUBECTL} cordon master-2
 		#${KUBECTL} cordon master-3
 	else
-		echo "not master1,skip csr and taint"
+		echo "not master1,skip csr,only taint and add label"
 	fi
 }
 
