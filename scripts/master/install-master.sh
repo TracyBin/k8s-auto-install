@@ -57,6 +57,8 @@ EOF
 	cp ${MASTER_ROOT}/environment.sh ${MASTER_ROOT}/certs/;
 	source ${MASTER_ROOT}/environment.sh
 	
+	# 创建ElasticSearch存储目录
+	mkdir -p /data/elastic-storage
 	echo "install pre success"
 	echo "------------------------------------------------------------"
 }

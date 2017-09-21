@@ -28,6 +28,16 @@ spec:
         value: "master"
         effect: "NoSchedule"
       serviceAccountName: elasticsearch
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: k8s-app
+                operator: In
+                values:
+                - elasticsearch-logging
+            topologyKey: kubernetes.io/hostname
       containers:
       - image: gcr.io/google_containers/elasticsearch:v2.4.1-2
         name: elasticsearch-logging
@@ -54,4 +64,5 @@ spec:
               fieldPath: metadata.namespace
       volumes:
       - name: es-persistent-storage
-        emptyDir: {}
+        hostPath:
+          path: /data/elastic-storage
