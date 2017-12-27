@@ -4,6 +4,7 @@
 > 脚本安装完成后，所有的组件均使用TLS加密通信，部署架构为：三台master节点，N台node节点，master节点可与node节点合用
 
 > **所有的安装均以admin用户为例，有sudo权限**
+> 二进制文件百度网盘 https://pan.baidu.com/s/1i5MU721
 
 ### 安装前置条件
 - centos7 
