@@ -1,4 +1,4 @@
-# k8s-auto-install ----Asiainfo-CMC-JF
+# k8s-auto-install 
 > 当前版本为release-1.1分支。增加如下功能
 - 在master节点安装kubelet和kube-proxy(因heapster数据均通过apiserver代理获取，所以master节点需和pod网络打通，所以需要安装kubelet来管理calico容器)
 - 增加日志EFK的部署
